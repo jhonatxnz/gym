@@ -1,10 +1,11 @@
 package com.app.gym.controller;
 
-import com.app.gym.dto.CreateUserRequest;
 import com.app.gym.model.User;
 import com.app.gym.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,10 +16,13 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody CreateUserRequest createUserRequest) {
-        User newUser = userService.createUser(createUserRequest);
-        return ResponseEntity.ok(newUser);
-    }
+    @GetMapping("/me")
+    public ResponseEntity<User> getMyProfile(@AuthenticationPrincipal UserDetails userDetails) {
 
+        User user = (User) userDetails;
+
+        user.setPassword(null);
+
+        return ResponseEntity.ok(user);
+    }
 }

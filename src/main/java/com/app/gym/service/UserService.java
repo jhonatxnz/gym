@@ -1,6 +1,6 @@
 package com.app.gym.service;
 
-import com.app.gym.dto.CreateUserRequest;
+import com.app.gym.dto.CreateUserRequestDto;
 import com.app.gym.model.Goal;
 import com.app.gym.model.WorkoutType;
 import com.app.gym.model.User;
@@ -9,6 +9,7 @@ import com.app.gym.repository.WorkoutTypeRepository;
 import com.app.gym.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 @RequiredArgsConstructor
@@ -17,22 +18,35 @@ public class UserService {
     private final UserRepository userRepo;
     private final GoalRepository goalRepo;
     private final WorkoutTypeRepository workoutTypeRepo;
+    private final PasswordEncoder passwordEncoder;
 
-    public User createUser(CreateUserRequest request) {
-        Goal goal = goalRepo.findById(request.getGoalId())
-                .orElseThrow(() -> new RuntimeException("Goal not found ID: " + request.getGoalId()));
+    public User createUser(CreateUserRequestDto createUserRequest) {
 
-        WorkoutType workoutType = workoutTypeRepo.findById(request.getWorkoutTypeId())
-                .orElseThrow(() -> new RuntimeException("Workout Type not found ID: " + request.getWorkoutTypeId()));
+        if (userRepo.findByEmail(createUserRequest.getEmail()) != null) {
+            throw new RuntimeException("Email já cadastrado!");
+        }
 
-        User user = new User();
-        user.setName(request.getName());       // Antes era setNome
-        user.setGender(request.getGender());   // Antes era setGenero
-        user.setHeight(request.getHeight());   // Antes era setAltura
-        user.setWeight(request.getWeight());   // Antes era setPeso
-        user.setGoal(goal);                    // Antes era setObjetivo
-        user.setWorkoutType(workoutType);      // Antes era setTipoTreino
+        Goal goal = goalRepo.findById(createUserRequest.getGoalId())
+                .orElseThrow(() -> new RuntimeException("Goal not found ID: " + createUserRequest.getGoalId()));
 
-        return userRepo.save(user);
+        WorkoutType workoutType = workoutTypeRepo.findById(createUserRequest.getWorkoutTypeId())
+                .orElseThrow(() -> new RuntimeException("Workout Type not found ID: " + createUserRequest.getWorkoutTypeId()));
+
+        User newUser = new User();
+
+        newUser.setName(createUserRequest.getName());
+        newUser.setGender(createUserRequest.getGender());
+        newUser.setHeight(createUserRequest.getHeight());
+        newUser.setWeight(createUserRequest.getWeight());
+
+        newUser.setEmail(createUserRequest.getEmail());
+        newUser.setRole("USER");
+        String encryptedPassword = passwordEncoder.encode(createUserRequest.getPassword());
+        newUser.setPassword(encryptedPassword);
+
+        newUser.setGoal(goal);
+        newUser.setWorkoutType(workoutType);
+
+        return userRepo.save(newUser);
     }
 }
