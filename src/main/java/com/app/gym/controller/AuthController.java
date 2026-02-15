@@ -1,16 +1,15 @@
 package com.app.gym.controller;
 
-import com.app.gym.dto.CreateUserRequestDto;
+import com.app.gym.dto.*;
 import com.app.gym.dto.CreateUserRequestDto;
 import com.app.gym.dto.LoginRequestDto;
-import com.app.gym.dto.LoginRequestDto;
-import com.app.gym.dto.LoginResponseDto;
 import com.app.gym.dto.LoginResponseDto;
 import com.app.gym.infra.security.TokenService;
 import com.app.gym.model.User;
 import com.app.gym.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,9 +37,11 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody @Valid CreateUserRequestDto createUserRequestDto) {
-        User newUser = userService.createUser(createUserRequestDto);
+    public ResponseEntity<UserResponseDto> register(@RequestBody @Valid CreateUserRequestDto data) {
+        User newUser = userService.createUser(data);
 
-        return ResponseEntity.ok().build();
+        UserResponseDto response = new UserResponseDto(newUser);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

@@ -14,6 +14,7 @@ public class CreateUserRequestDto {
     private Double weight;
     private Long goalId;
     private Long workoutTypeId;
+    private String experience;
 
     @NotBlank
     @Email(message = "Email deve ser válido")

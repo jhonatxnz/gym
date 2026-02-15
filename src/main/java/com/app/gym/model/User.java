@@ -47,6 +47,9 @@ public class User implements UserDetails {
     @JoinColumn(name = "id_tipo_treino")
     private WorkoutType workoutType;
 
+    @Column(name = "experiencia")
+    private String experience;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + this.role));

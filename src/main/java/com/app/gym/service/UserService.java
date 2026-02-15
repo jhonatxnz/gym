@@ -38,6 +38,7 @@ public class UserService {
         newUser.setGender(createUserRequest.getGender());
         newUser.setHeight(createUserRequest.getHeight());
         newUser.setWeight(createUserRequest.getWeight());
+        newUser.setExperience(createUserRequest.getExperience());
 
         newUser.setEmail(createUserRequest.getEmail());
         newUser.setRole("USER");
